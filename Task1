@@ -1,0 +1,61 @@
+import csv
+
+def read_csv(file_path):
+    try:
+        with open(file_path, newline='', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            data = [row for row in reader]
+        return data
+    except FileNotFoundError:
+        print(f"Помилка: файл {file_path} не знайдено.")
+        return []
+    except Exception as e:
+        print(f"Помилка: {str(e)}")
+        return []
+
+def write_csv(file_path, data):
+    try:
+        with open(file_path, 'w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+        print(f"Результат збережено у файлі {file_path}.")
+    except Exception as e:
+        print(f"Помилка: {str(e)}")
+
+def filter_data_by_country_and_year(data, country, start_year, end_year):
+    return [row for row in data if row['Country Name'] == country and int(row['Year']) in range(start_year, end_year + 1)]
+
+def main():
+    input_file_path = 'life-expectancy.csv'
+    output_file_path = 'comparison_result.csv'
+
+    # Читаємо дані з вхідного .csv файлу
+    data = read_csv(input_file_path)
+
+    # Виводимо дані на екран
+    for row in data:
+        print(row)
+
+    # Відбираємо дані для США та України за 2010-2019 роки
+    us_data = filter_data_by_country_and_year(data, 'United States', 2010, 2019)
+    ukraine_data = filter_data_by_country_and_year(data, 'Ukraine', 2010, 2019)
+
+    # Виводимо вибрані дані на екран
+    print("\nДані для США:")
+    for row in us_data:
+       print(row)
+
+    print("\nДані для України:")
+    for row in ukraine_data:
+       print(row)
+
+    # Порівнюємо значення та записуємо результат у новий .csv файл
+    comparison_result = [['Year', 'Life Expectancy (US)', 'Life Expectancy (Ukraine)']]
+    for us_row, ukraine_row in zip(us_data, ukraine_data):
+       comparison_result.append([us_row['Year'], us_row['Life expectancy at birth total (years)'], ukraine_row['Life expectancy at birth total (years)']])
+
+
+    write_csv(output_file_path, comparison_result)
+
+if __name__ == "__main__":
+    main()
