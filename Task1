@@ -43,17 +43,24 @@ def main():
     # Виводимо вибрані дані на екран
     print("\nДані для США:")
     for row in us_data:
-       print(row)
+        print(row)
 
     print("\nДані для України:")
     for row in ukraine_data:
-       print(row)
+        print(row)
 
     # Порівнюємо значення та записуємо результат у новий .csv файл
-    comparison_result = [['Year', 'Life Expectancy (US)', 'Life Expectancy (Ukraine)']]
+    comparison_result = [['Year', 'Life Expectancy (US)', 'Life Expectancy (Ukraine)', 'Comparison Result']]
     for us_row, ukraine_row in zip(us_data, ukraine_data):
-       comparison_result.append([us_row['Year'], us_row['Life expectancy at birth total (years)'], ukraine_row['Life expectancy at birth total (years)']])
+        us_expectancy = float(us_row['Life expectancy at birth total (years)']) if us_row['Life expectancy at birth total (years)'] else None
+        ukraine_expectancy = float(ukraine_row['Life expectancy at birth total (years)']) if ukraine_row['Life expectancy at birth total (years)'] else None
 
+        comparison_result.append([
+            us_row['Year'],
+            str(us_expectancy),
+            str(ukraine_expectancy),
+            f"US {'>' if us_expectancy > ukraine_expectancy else '<'} Ukraine ({abs(us_expectancy - ukraine_expectancy)})" if us_expectancy is not None and ukraine_expectancy is not None else ''
+        ])
 
     write_csv(output_file_path, comparison_result)
 
